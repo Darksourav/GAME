@@ -1,12 +1,14 @@
 // Card.js
 import React from 'react';
 
-function Card({ item, id, handleClick }) {
-  const itemClass = item.stat ? "active " + item.stat : "";
+function Card({ card, id, handleClick }) {
+  const handleCardClick = () => {
+    handleClick(id);
+  };
 
   return (
-    <div className={"Card " + itemClass} onClick={() => handleClick(id)}>
-      <img src={item.img} alt="" />
+    <div className="Card" onClick={handleCardClick}>
+      <img src={card.img} alt="" />
     </div>
   );
 }

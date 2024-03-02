@@ -1,53 +1,32 @@
 // Cards.js (Parent Component)
 import React, { useState } from 'react';
-import Card from './Card';
+import Card from './Card'; // Make sure the path to Card component is correct
+
+const initialDeck = [
+  { id: 0, img: '/img/BOMB.jpg', type: 'bomb' },
+  { id: 1, img: '/img/CAT.jpg', type: 'cat' },
+  { id: 2, img: '/img/defuce.jpg', type: 'defuse' },
+  { id: 3, img: '/img/shuffele.jpg', type: 'shuffle' },
+  { id: 4, img: '/img/R.jpg', type: 'normal' },
+];
 
 function Cards() {
-  const [items, setItems] = useState([
-    { id: 0, img: '/img/BOMB.jpg', stat: 'bomb' },
-    { id: 1, img: '/img/CAT.jpg', stat: 'cat' },
-    { id: 2, img: '/img/defuce.jpg', stat: 'defuse' },
-    { id: 3, img: '/img/shuffele.jpg', stat: 'shuffle' },
-    { id: 4, img: '/img/shuffle.jpg', stat: 'shuffle' }, // Corrected image path
-  ].sort(() => Math.random() - 0.5));
+  const [deck, setDeck] = useState(initialDeck.sort(() => Math.random() - 0.5));
   const [revealedCards, setRevealedCards] = useState([]);
-  const [gameStarted, setGameStarted] = useState(false); 
+  const [gameStarted, setGameStarted] = useState(false);
 
   function handleClick(id) {
-    if (!gameStarted) {
-      return; 
-    }
+    if (!gameStarted) return;
 
-    const clickedCard = items.find(card => card.id === id);
+    const selectedCard = deck.find(card => card.id === id);
+    handleCardEffect(selectedCard);
+    setRevealedCards([...revealedCards, selectedCard]);
+    setDeck(deck.filter(card => card.id !== id));
 
-    switch (clickedCard.stat) {
-      case 'bomb':
-        alert("You Lose! Game Over!");
-        setGameStarted(false);
-        break;
-      case 'cat':
-        setItems(items.filter(card => card.id !== id));
-        break;
-      case 'defuse':
-        setItems(items.filter(card => card.id !== id));
-        break;
-      case 'shuffle':
-        setItems([
-          { id: 0, img: '/img/BOMB.jpg', stat: 'bomb' },
-          { id: 1, img: '/img/CAT.jpg', stat: 'cat' },
-          { id: 2, img: '/img/defuce.jpg', stat: 'defuse' },
-          { id: 3, img: '/img/shuffele.jpg', stat: 'shuffle' },
-          { id: 4, img: '/img/R.jpg', stat: 'shuffle'  },
-        ].sort(() => Math.random() - 0.5));
-        break;
-      default:
-        break;
-    }
-
-    setRevealedCards([...revealedCards, clickedCard]);
-    if (revealedCards.length === 4 && clickedCard.stat !== 'bomb') {
-      alert("Congratulations! You Win!");
-      setGameStarted(false);
+    // Check if all cards are revealed and the player wins
+    if (revealedCards.length === 4) {
+      alert('Congratulations! You won the game!');
+      resetGame();
     }
   }
 
@@ -55,11 +34,38 @@ function Cards() {
     setGameStarted(true);
   }
 
+  function resetGame() {
+    setGameStarted(false);
+    setDeck(initialDeck.sort(() => Math.random() - 0.5));
+    setRevealedCards([]);
+  }
+
+  function handleCardEffect(card) {
+    switch (card.type) {
+      case 'cat':
+        alert('You drew a Cat card!');
+        break;
+      case 'bomb':
+        alert('You drew a Bomb! Game Over!');
+        resetGame();
+        break;
+      case 'defuse':
+        alert('You drew a Defuse card!');
+        break;
+      case 'shuffle':
+        alert('You drew a Shuffle card! Restarting the game.');
+        resetGame();
+        break;
+      default:
+        alert('You drew a Normal card.');
+    }
+  }
+
   return (
     <div className="Container">
-      <button className="Button" onClick={handleStart}>Start</button>
-      {items.map((item, index) => (
-        <Card key={index} item={item} id={item.id} handleClick={handleClick} />
+      <button className="Button" onClick={handleStart} disabled={gameStarted}>Start</button> {/* Start button */}
+      {deck.map((card, index) => (
+        <Card key={card.id} card={card} id={card.id} handleClick={handleClick} />
       ))}
     </div>
   );
