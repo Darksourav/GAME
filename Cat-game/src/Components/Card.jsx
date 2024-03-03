@@ -13,4 +13,4 @@ function Card({ card, id, handleClick }) {
   );
 }
 
-export default Card;
+export default Card:
